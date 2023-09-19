@@ -1,13 +1,9 @@
 # PaleoOceanStarter
-Procedural generation of idealised ocean temperatures to initialise paleoclimate model simulations
+Procedural generation of idealised ocean temperatures to initialise paleoclimate model simulations. The Jupyter Notebook contains the Python implementation of the equations below
+and was used to produce the initial ocean temperature and salinity distributions for the HadGEM3 Eocene simulations at multiple $CO_2$ levels (1x-4x). It can be easily adapted
+to be used with other ocean grids.
 
-NEMO needs monthly mean 3D fields of temperature and salinity to initilise the ocean. Eocene temperatures are produced in the following way:
-1. Copy modern reference file (for correct metadata).
-2. Loop over each latitude and longitude and calculate the local vertical temperature profile. Necesseary due to curvilinear grid in NEMO. This could be simpliefied to save some computation time for more regular grids.
-3. Salinities are set to a single global value of 34.7.
-4. Save new temperature and salinity field to disk
-
-## initial temperature distribution
+## idealised temperature distribution
 The DeepMIP-Eocene experimental design paper (Lunt et al., 2017), suggests the following equation to generate the initial horizontal and vertical temperature distribution:
 
 $$   T[^{\circ}C] =
@@ -29,6 +25,7 @@ $$   T[^{\circ}C] =
 $$
 
 where $\phi$ is latitude and z is depth below the surface. $T_{upper}$ and $T_{deep}$ are scaling parameters that only depend on the global mean surface temperature (GMST). The relation between the GMST and the deep ocean temperatures is taken from a large ensemble of HadCM3BL simulations across the Phanerozoic (Fig. 11 in Valdes et al., 2021) and can be expressed as:
+
 $$
 T_{deep} = \frac{GMST - 15.4}{0.76}
 \tag{3}
@@ -37,6 +34,7 @@ $$
 With this, we can numerically solve for $T_{upper}$. 
 
 Assumption:  We can calculate $T_{deep}$ and need to chose $T_{upper}$ so that at the surface (i.e. z=0), Eq. (2) reproduces the initial GMST value when averaged over the globe, i.e. given (for z=0 and weights=$cos \:\phi $):
+
 $$
 T[^{\circ}C] = T_{upper} \times weights^2 + T_{deep}
 \tag{4}
@@ -48,7 +46,16 @@ GMST = \frac{\sum weights \times T}{\sum weights}
 $$
 
 will give:
+
 $$
 T_{upper} =\frac{GMST - T_{deep}}{\frac{\sum weights \times weights^2}{\sum weights}} \approx \frac{GMST - T_{deep}}{0.67}
 \tag{6}
 $$
+
+## NEMO implementation
+NEMO needs monthly mean 3D fields of temperature and salinity to initilise the ocean. Eocene temperatures are produced in the following way:
+1. Copy modern reference file (for correct metadata).
+2. Loop over each latitude and longitude and calculate the local vertical temperature profile. Necesseary due to curvilinear grid in NEMO. This could be simpliefied to save some computation time for more regular grids.
+3. Salinities are set to a single global value of 34.7.
+4. Save new temperature and salinity field to disk
+
