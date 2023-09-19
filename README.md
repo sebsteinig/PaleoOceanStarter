@@ -3,6 +3,9 @@ Procedural generation of idealised ocean temperatures to initialise paleoclimate
 and was used to produce the initial ocean temperature and salinity distributions for the HadGEM3 Eocene simulations at multiple $CO_2$ levels (1x-4x). It can be easily adapted
 to be used with other ocean grids.
 
+![initial_ocean_profiles](https://github.com/sebsteinig/PaleoOceanStarter/assets/80361118/e62f3f29-313c-4354-ae59-d3def7f1ff12)
+**Figure 1:** Global mean profiles of initial Eocene ocean temperatures generated with this method compared to reference data sets.
+
 ## idealised temperature distribution
 The DeepMIP-Eocene experimental design paper (Lunt et al., 2017), suggests the following equation to generate the initial horizontal and vertical temperature distribution:
 
@@ -52,10 +55,14 @@ T_{upper} =\frac{GMST - T_{deep}}{\frac{\sum weights \times weights^2}{\sum weig
 \tag{6}
 $$
 
+![T_deep_and_T_upper_vs_GMST](https://github.com/sebsteinig/PaleoOceanStarter/assets/80361118/f9b58422-33df-4bcf-b780-0da891a287b3)
+**Figure 2:** Dependency of $T_{deep}$ and $T_{upper}$ parameters on global mean surface temperature (GMST).
+
 ## NEMO implementation
 NEMO needs monthly mean 3D fields of temperature and salinity to initilise the ocean. Eocene temperatures are produced in the following way:
 1. Copy modern reference file (for correct metadata).
 2. Loop over each latitude and longitude and calculate the local vertical temperature profile. Necesseary due to curvilinear grid in NEMO. This could be simpliefied to save some computation time for more regular grids.
 3. Salinities are set to a single global value of 34.7.
 4. Save new temperature and salinity field to disk
+
 
